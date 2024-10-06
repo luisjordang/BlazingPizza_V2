@@ -1,0 +1,100 @@
+@page "/myorders/{orderId:int}"
+@inject NavigationManager NavigationManager
+@inject HttpClient HttpClient
+
+@* <div class="top-bar">
+<a class="logo" href="">
+<img src="img/logo.svg" />
+</a>
+
+<NavLink href="" class="nav-tab" Match="NavLinkMatch.All">
+<img src="img/pizza-slice.svg" />
+<div>Get Pizza</div>
+</NavLink>
+
+<NavLink href="myorders" class="nav-tab">
+<img src="img/bike.svg" />
+<div>My Orders</div>
+</NavLink>
+
+</div> *@
+
+<div class="main">
+    @if (invalidOrder)
+    {
+        @* Muestra un mensaje cuando el pedido no se encuentra *@
+        <h2>Order not found</h2>
+        <p>We're sorry but this order no longer exists.</p>
+    }
+    else if (orderWithStatus == null)
+    {
+        @* Div para mostrar el estado de la carga del pedido *@
+        <div class="track-order">
+        <div class="track-order-title">
+            <h2>
+                <text>Loading...</text>
+            </h2>
+            <p class="ml-auto mb-0">
+                ...
+            </p>
+        </div>
+    </div>
+    }
+    else
+    {
+        <div class="track-order">
+            <div class="track-order-title">
+                <h2>
+                    Order placed @orderWithStatus.Order.CreatedTime.ToLongDateString()
+                </h2>
+                <p class="ml-auto mb-0">
+                    Status: <strong>@orderWithStatus.StatusText</strong>
+                </p>
+            </div>
+            <div class="track-order-body">
+                <div class="track-order-details">
+                    @* Recorre las pizzas del pedido y muestra los detalles *@
+                    @foreach (var pizza in orderWithStatus.Order.Pizzas)
+                    {
+                        <p>
+                            <strong>
+                                @(pizza.Size)"
+                                @pizza.Special.Name
+                                (£@pizza.GetFormattedTotalPrice())
+                            </strong>
+                        </p>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    // Propiedad que recibe el ID del pedido
+    [Parameter] public int OrderId { get; set; }
+
+    // Objeto que almacena el pedido junto con su estado
+    OrderWithStatus orderWithStatus;
+
+    // Bandera que indica si el pedido no se encuentra
+    bool invalidOrder = false;
+
+    // Método que se ejecuta cuando se establecen los parámetros del componente
+    protected override async Task OnParametersSetAsync()
+    {
+        try
+        {
+            // Realiza una solicitud HTTP para obtener el pedido con su esta
+            orderWithStatus = await HttpClient.GetFromJsonAsync<OrderWithStatus>(
+            $"{NavigationManager.BaseUri}orders/{OrderId}");
+        }
+        catch (Exception ex)
+        {
+            // Si ocurre una excepción, establece la bandera de pedido no válido
+            invalidOrder = true;
+            // Imprime el error en la consola
+            Console.Error.WriteLine(ex);
+        }
+    }
+}

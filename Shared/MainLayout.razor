@@ -1,0 +1,37 @@
+@inherits LayoutComponentBase
+
+<div id="app">
+
+  @* Barra superior de la aplicación *@
+  <header class="top-bar">
+    @* Enlace a la página principal de la aplicación *@
+    <a class="logo" href="">
+      <img src="img/logo.svg" />
+    </a>
+
+    @* Enlace a la página de pedidos de pizza *@
+    <NavLink href="" class="nav-tab" Match="NavLinkMatch.All">
+      <img src="img/pizza-slice.svg" />
+      @* Título de la pestaña de pedidos *@
+      <div>Get Pizza</div>
+    </NavLink>
+
+    @* Enlace a la página de seguimiento de pedidos *@
+    <NavLink href="myorders" class="nav-tab">
+      <img src="img/bike.svg" />
+      <div>My Orders</div>
+    </NavLink>
+  </header>
+
+  @* Contenido principal de la aplicación *@
+  <div class="content">
+    @* Cuerpo de la página, donde se mostrará el contenido específico de cada página *@
+    @Body
+  </div>
+
+  @* Pie de página de la aplicación *@
+  <footer>
+    &copy; Blazing Pizza @DateTime.UtcNow.Year
+  </footer>
+
+</div>

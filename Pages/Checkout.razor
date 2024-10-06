@@ -1,0 +1,75 @@
+@page "/checkout"
+
+@* Because ordersate is inside a folder it is necesary to add it "@using BlazingPizza.Services" *@
+@using BlazingPizza.Services
+@inject OrderState OrderState
+@inject HttpClient HttpClient
+@inject NavigationManager NavigationManager
+
+@* <div class="top-bar">
+<a class="logo" href="">
+<img src="img/logo.svg" />
+</a>
+
+<NavLink href="" class="nav-tab" Match="NavLinkMatch.All">
+<img src="img/pizza-slice.svg" />
+<div>Get Pizza</div>
+</NavLink>
+
+<NavLink href="myorders" class="nav-tab">
+<img src="img/bike.svg" />
+<div>My Orders</div>
+</NavLink>
+</div> *@
+
+<div class="main">
+    <div class="checkout-cols">
+        <div class="checkout-order-details">
+            <h4>Review order</h4>
+            @foreach (var pizza in Order.Pizzas)
+            {
+                <p>
+                    <strong>
+                        @* Muestra el tamaño, nombre especial y precio total formateado de cada pizza en el pedido*@
+                        @(pizza.Size)"
+                        @pizza.Special.Name
+                        (£@pizza.GetFormattedTotalPrice())
+                    </strong>
+                </p>
+            }
+
+            <p>
+                <strong>
+                    Total price:
+                    £@Order.GetFormattedTotalPrice()
+                </strong>
+            </p>
+        </div>
+    </div>
+
+    @* Botón para realizar el pedido, desactivado mientras se está procesando el envío *@
+    <button class="checkout-button btn btn-warning" @onclick="PlaceOrder" disabled=@isSubmitting>
+        Place order
+    </button>
+</div>
+
+@code {
+    // Propiedad que obtiene el pedido actual desde el estado del pedido
+    Order Order => OrderState.Order;
+
+    // Variable que indica si el pedido se está enviando actualmente
+    bool isSubmitting;
+
+    // Método asincrónico para realizar el pedido
+    async Task PlaceOrder()
+    {
+        isSubmitting = true; // Marca que el pedido está en proceso de envío
+        // Envía el pedido al servidor en formato JSON y espera la respuesta
+        var response = await HttpClient.PostAsJsonAsync($"{NavigationManager.BaseUri}orders", OrderState.Order);
+        // Lee la respuesta del servidor y obtiene el nuevo ID del pedido
+        var newOrderId = await response.Content.ReadFromJsonAsync<int>();
+        OrderState.ResetOrder(); // Restablece el estado del pedido después de enviarlo
+        // Navega a la página de pedidos del usuario utilizando el nuevo ID de pedido
+        NavigationManager.NavigateTo($"myorders/{newOrderId}");
+    }
+}

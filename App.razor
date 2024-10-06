@@ -1,0 +1,14 @@
+﻿<Router AppAssembly="typeof(Program).Assembly" Context="routeData">
+    <!-- Configuración de la ruta encontrada -->
+    <Found>
+        <!-- Vista de la ruta encontrada, utilizando un diseño por defecto -->
+        <RouteView RouteData="routeData" DefaultLayout="typeof(MainLayout)" />
+    </Found>
+    <!-- Configuración para cuando no se encuentra la ruta -->
+    <NotFound>
+        <!-- Vista de diseño para rutas no encontradas -->
+        <LayoutView Layout="typeof(MainLayout)">
+            <div class="main">Sorry, there's nothing at this address.</div>
+        </LayoutView>
+    </NotFound>
+</Router>
